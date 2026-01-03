@@ -1,6 +1,6 @@
--- Polaz FPS | CheckFps Optimized
+-- Fuckin Blue Balloons Check| CheckFps Final
 -- FPS | Ping | Players | Played Time
--- Balloon Pollen (Field)
+-- Balloon Count (Field)
 -- Dark/Light Mode | Minimize | Hop/Small Server | Anti-AFK
 
 pcall(function()
@@ -148,11 +148,11 @@ smallBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- FPS / Played Time / Balloon Pollen (Field)
+-- FPS / Played Time / Balloon Count (Field)
 local startTime = os.clock()
 local fps, frames, last = 0, 0, tick()
 local balloonUpdate = 0
-local balloonPollen = 0
+local balloonCount = 0
 
 RunService.RenderStepped:Connect(function(dt)
 	frames += 1
@@ -162,7 +162,7 @@ RunService.RenderStepped:Connect(function(dt)
 		last = tick()
 	end
 
-	-- Cập nhật Balloon pollen 1 lần mỗi giây
+	-- Cập nhật Balloon count 1 lần mỗi giây
 	balloonUpdate += dt
 	if balloonUpdate >= 1 then
 		balloonUpdate = 0
@@ -171,16 +171,12 @@ RunService.RenderStepped:Connect(function(dt)
 			for _,obj in ipairs(workspace:GetDescendants()) do
 				if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
 					if obj.Owner.Value == player then
-						if obj:FindFirstChild("Pollen") then
-							count += math.floor(obj.Pollen.Value)
-						elseif obj:FindFirstChild("CurrentPollen") then
-							count += math.floor(obj.CurrentPollen.Value)
-						end
+						count += 1
 					end
 				end
 			end
 		end)
-		balloonPollen = count
+		balloonCount = count
 	end
 
 	info.Text =
@@ -188,5 +184,5 @@ RunService.RenderStepped:Connect(function(dt)
 		"\nPing: "..math.floor(player:GetNetworkPing()*1000).." ms"..
 		"\nPlayers: "..#Players:GetPlayers()..
 		"\nPlayed Time: "..math.floor(os.clock() - startTime).."s"..
-		"\nBalloon Pollen (Field): "..balloonPollen
+		"\nBalloons on Field: "..balloonCount
 end)
