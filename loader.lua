@@ -1,13 +1,12 @@
--- Balloons Check by Polaz | CheckFps
+-- Balloons Check | CheckFps Optimized
 -- FPS | Ping | Players | Played Time
--- Balloon Pollen (Hive/Field nếu client có thể đọc)
+-- Balloon Pollen (Field/Hive nếu client có thể đọc)
 -- Dark/Light Mode | Minimize | Hop/Small Server | Anti-AFK
 
 pcall(function()
 	game.Players.LocalPlayer.PlayerGui:FindFirstChild("PolazFPS"):Destroy()
 end)
 
--- Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -18,7 +17,7 @@ local VirtualUser = game:GetService("VirtualUser")
 local player = Players.LocalPlayer
 local placeId = game.PlaceId
 
--- Anti AFK
+-- Anti-AFK
 player.Idled:Connect(function()
 	VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
 	task.wait(0.5)
@@ -152,8 +151,10 @@ end)
 -- FPS / Played Time / Balloon Pollen
 local startTime = os.clock()
 local fps, frames, last = 0, 0, tick()
+local balloonUpdate = 0
+local balloonPollen = 0
 
-RunService.RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function(dt)
 	frames += 1
 	if tick() - last >= 1 then
 		fps = frames
@@ -161,47 +162,59 @@ RunService.RenderStepped:Connect(function()
 		last = tick()
 	end
 
-	-- Balloon pollen (Hive + Field nếu client thấy)
-	local balloonPollen = 0
-	pcall(function()
-		-- 1️⃣ Field Balloon
-		for _,obj in ipairs(workspace:GetDescendants()) do
-			if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
-				if obj.Owner.Value == player then
-					if obj:FindFirstChild("Pollen") then
-						balloonPollen = math.floor(obj.Pollen.Value)
-						return
-					elseif obj:FindFirstChild("CurrentPollen") then
-						balloonPollen = math.floor(obj.CurrentPollen.Value)
-						return
-					end
-				end
-			end
-		end
-		-- 2️⃣ Hive Balloon (workspace.Hives/HiveModels nếu client thấy)
-		for _,hive in ipairs(workspace:GetChildren()) do
-			if hive.Name:lower():find("hive") then
-				for _,obj in ipairs(hive:GetDescendants()) do
-					if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
-						if obj.Owner.Value == player then
-							if obj:FindFirstChild("Pollen") then
-								balloonPollen = math.floor(obj.Pollen.Value)
-								return
-							elseif obj:FindFirstChild("CurrentPollen") then
-								balloonPollen = math.floor(obj.CurrentPollen.Value)
-								return
-							end
+	-- Cập nhật Balloon pollen 1 lần mỗi giây → tránh lag
+	balloonUpdate += dt
+	if balloonUpdate >= 1 then
+		balloonUpdate = 0
+		pcall(function()
+			local found = false
+			-- Field Balloon
+			for _,obj in ipairs(workspace:GetDescendants()) do
+				if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
+					if obj.Owner.Value == player then
+						if obj:FindFirstChild("Pollen") then
+							balloonPollen = math.floor(obj.Pollen.Value)
+							found = true
+							break
+						elseif obj:FindFirstChild("CurrentPollen") then
+							balloonPollen = math.floor(obj.CurrentPollen.Value)
+							found = true
+							break
 						end
 					end
 				end
 			end
-		end
-	end)
+			-- Hive Balloon (workspace.Hives/HiveModels nếu client thấy)
+			if not found then
+				for _,hive in ipairs(workspace:GetChildren()) do
+					if hive.Name:lower():find("hive") then
+						for _,obj in ipairs(hive:GetDescendants()) do
+							if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
+								if obj.Owner.Value == player then
+									if obj:FindFirstChild("Pollen") then
+										balloonPollen = math.floor(obj.Pollen.Value)
+										found = true
+										break
+									elseif obj:FindFirstChild("CurrentPollen") then
+										balloonPollen = math.floor(obj.CurrentPollen.Value)
+										found = true
+										break
+									end
+								end
+							end
+						end
+						if found then break end
+					end
+				end
+			end
+			if not found then balloonPollen = 0 end
+		end)
+	end
 
 	info.Text =
 		"FPS: "..fps..
 		"\nPing: "..math.floor(player:GetNetworkPing()*1000).." ms"..
 		"\nPlayers: "..#Players:GetPlayers()..
 		"\nPlayed Time: "..math.floor(os.clock() - startTime).."s"..
-		"\nBalloon Pollen (Hive/Field): "..balloonPollen
+		"\nBalloon Pollen: "..balloonPollen
 end)
