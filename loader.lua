@@ -175,12 +175,16 @@ RunService.RenderStepped:Connect(function()
 		last = tick()
 	end
 
-	-- Lấy pollen Balloon (BSS)
+	-- Lấy pollen Balloon chính xác
 	local balloonPollen = 0
 	pcall(function()
-		local hive = workspace:FindFirstChild("Hive") -- chỉnh theo tên Hive trong game
-		if hive and hive:FindFirstChild("Balloon") and hive.Balloon:FindFirstChild("Pollen") then
-			balloonPollen = hive.Balloon.Pollen.Value
+		-- Thay 'Hive' bằng object hive thật của bạn trong workspace
+		local hive = workspace:FindFirstChild(player.Name.."Hive") 
+		if hive then
+			local balloon = hive:FindFirstChild("Balloon")
+			if balloon and balloon:FindFirstChild("Pollen") then
+				balloonPollen = balloon.Pollen.Value
+			end
 		end
 	end)
 
