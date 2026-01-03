@@ -1,4 +1,4 @@
--- Polaz FPS | CheckFps + Balloon Pollen
+-- Gay Hub | CheckFps + Balloon Pollen
 -- FPS | Ping | Players | Played Time | Balloon Pollen
 -- Dark/Light Mode | Minimize | Hop/Small Server | Anti-AFK
 
@@ -175,15 +175,19 @@ RunService.RenderStepped:Connect(function()
 		last = tick()
 	end
 
-	-- Lấy pollen Balloon chính xác
+	-- Lấy pollen Balloon chính xác trong BSS
 	local balloonPollen = 0
 	pcall(function()
-		-- Thay 'Hive' bằng object hive thật của bạn trong workspace
-		local hive = workspace:FindFirstChild(player.Name.."Hive") 
-		if hive then
-			local balloon = hive:FindFirstChild("Balloon")
-			if balloon and balloon:FindFirstChild("Pollen") then
-				balloonPollen = balloon.Pollen.Value
+		for _,obj in ipairs(workspace:GetDescendants()) do
+			if obj.Name == "Balloon" and obj:FindFirstChild("Owner") then
+				if obj.Owner.Value == player then
+					if obj:FindFirstChild("Pollen") then
+						balloonPollen = obj.Pollen.Value
+					elseif obj:FindFirstChild("CurrentPollen") then
+						balloonPollen = obj.CurrentPollen.Value
+					end
+					break
+				end
 			end
 		end
 	end)
