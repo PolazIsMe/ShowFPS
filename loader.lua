@@ -1,7 +1,7 @@
--- Fuck FPS counter ez| CheckFps Optimized
+-- Fuck Fps ez | CheckFps Optimized
 -- FPS | Ping | Players | Played Time
 -- Dark/Light Mode | Minimize | Hop/Small Server | Anti-AFK
--- Fix Lag: remove heavy objects client-side
+-- Fix Lag: remove all objects client-side
 
 pcall(function()
 	game.Players.LocalPlayer.PlayerGui:FindFirstChild("PolazFPS"):Destroy()
@@ -11,6 +11,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
 local VirtualUser = game:GetService("VirtualUser")
 
 local player = Players.LocalPlayer
@@ -23,12 +24,10 @@ player.Idled:Connect(function()
 	VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
 end)
 
--- Fix Lag: remove heavy objects client-side
+-- Fix Lag: remove all objects client-side except player character and camera
 pcall(function()
-	for _,obj in ipairs(workspace:GetDescendants()) do
-		if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Smoke") or obj:IsA("Sparkles") then
-			obj:Destroy()
-		elseif obj:IsA("MeshPart") and obj.Name:lower():find("tree") then
+	for _, obj in ipairs(workspace:GetChildren()) do
+		if obj ~= player.Character and obj.ClassName ~= "Camera" then
 			obj:Destroy()
 		end
 	end
@@ -175,5 +174,5 @@ RunService.RenderStepped:Connect(function()
 		"\nPing: "..math.floor(player:GetNetworkPing()*1000).." ms"..
 		"\nPlayers: "..#Players:GetPlayers()..
 		"\nPlayed Time: "..math.floor(os.clock() - startTime).."s"..
-		"\nLag Fix: Objects cleaned"
+		"\nLag Fix: World cleared client-side"
 end)
