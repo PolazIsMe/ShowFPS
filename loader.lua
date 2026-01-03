@@ -1,7 +1,7 @@
--- Fuckin Blue Balloons Check| CheckFps Final
+-- Fuck FPS counter ez| CheckFps Optimized
 -- FPS | Ping | Players | Played Time
--- Balloon Count (Field)
 -- Dark/Light Mode | Minimize | Hop/Small Server | Anti-AFK
+-- Fix Lag: remove heavy objects client-side
 
 pcall(function()
 	game.Players.LocalPlayer.PlayerGui:FindFirstChild("PolazFPS"):Destroy()
@@ -11,7 +11,6 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local TeleportService = game:GetService("TeleportService")
-local HttpService = game:GetService("HttpService")
 local VirtualUser = game:GetService("VirtualUser")
 
 local player = Players.LocalPlayer
@@ -24,6 +23,17 @@ player.Idled:Connect(function()
 	VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
 end)
 
+-- Fix Lag: remove heavy objects client-side
+pcall(function()
+	for _,obj in ipairs(workspace:GetDescendants()) do
+		if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Smoke") or obj:IsA("Sparkles") then
+			obj:Destroy()
+		elseif obj:IsA("MeshPart") and obj.Name:lower():find("tree") then
+			obj:Destroy()
+		end
+	end
+end)
+
 -- GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "PolazFPS"
@@ -32,7 +42,7 @@ gui.Parent = player:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
 frame.Parent = gui
-frame.Size = UDim2.new(0, 235, 0, 170)
+frame.Size = UDim2.new(0, 235, 0, 140)
 frame.Position = UDim2.new(1, -255, 0, 30)
 frame.AnchorPoint = Vector2.new(1,0)
 frame.BackgroundColor3 = Color3.fromRGB(255,255,255)
@@ -110,7 +120,7 @@ minBtn.MouseButton1Click:Connect(function()
 	hopBtn.Visible = not minimized
 	smallBtn.Visible = not minimized
 	TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-		{Size = minimized and UDim2.new(0, 55, 0, 45) or UDim2.new(0, 235, 0, 170)}):Play()
+		{Size = minimized and UDim2.new(0, 55, 0, 45) or UDim2.new(0, 235, 0, 140)}):Play()
 end)
 
 -- Hop Server
@@ -148,13 +158,11 @@ smallBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- FPS / Played Time / Balloon Count (Field)
+-- FPS / Played Time
 local startTime = os.clock()
 local fps, frames, last = 0, 0, tick()
-local balloonUpdate = 0
-local balloonCount = 0
 
-RunService.RenderStepped:Connect(function(dt)
+RunService.RenderStepped:Connect(function()
 	frames += 1
 	if tick() - last >= 1 then
 		fps = frames
@@ -162,27 +170,10 @@ RunService.RenderStepped:Connect(function(dt)
 		last = tick()
 	end
 
-	-- Cập nhật Balloon count 1 lần mỗi giây
-	balloonUpdate += dt
-	if balloonUpdate >= 1 then
-		balloonUpdate = 0
-		local count = 0
-		pcall(function()
-			for _,obj in ipairs(workspace:GetDescendants()) do
-				if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
-					if obj.Owner.Value == player then
-						count += 1
-					end
-				end
-			end
-		end)
-		balloonCount = count
-	end
-
 	info.Text =
 		"FPS: "..fps..
 		"\nPing: "..math.floor(player:GetNetworkPing()*1000).." ms"..
 		"\nPlayers: "..#Players:GetPlayers()..
 		"\nPlayed Time: "..math.floor(os.clock() - startTime).."s"..
-		"\nBalloons on Field: "..balloonCount
+		"\nLag Fix: Objects cleaned"
 end)
