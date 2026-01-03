@@ -1,6 +1,12 @@
--- Gay Hub | CheckFps + Balloon Pollen
--- FPS | Ping | Players | Played Time | Balloon Pollen
--- Dark/Light Mode | Minimize | Hop/Small Server | Anti-AFK
+--[[ 
+    Polaz FPS | CheckFps
+    FPS | Ping | Players | Played Time
+    Balloon Pollen (Hive - nếu game expose)
+    Dark / Light Mode
+    Minimize (icon-only)
+    Hop Server / Small Server
+    Anti-AFK (ngầm)
+]]
 
 pcall(function()
 	game.Players.LocalPlayer.PlayerGui:FindFirstChild("PolazFPS"):Destroy()
@@ -30,9 +36,10 @@ gui.Name = "PolazFPS"
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 230, 0, 160)
-frame.Position = UDim2.new(1, -250, 0, 30)
+local frame = Instance.new("Frame")
+frame.Parent = gui
+frame.Size = UDim2.new(0, 235, 0, 170)
+frame.Position = UDim2.new(1, -255, 0, 30)
 frame.AnchorPoint = Vector2.new(1,0)
 frame.BackgroundColor3 = Color3.fromRGB(255,255,255)
 frame.BackgroundTransparency = 0.15
@@ -49,7 +56,7 @@ local scale = Instance.new("UIScale", frame)
 scale.Scale = 0.5
 TweenService:Create(
 	scale,
-	TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+	TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
 	{Scale = 1}
 ):Play()
 
@@ -66,7 +73,7 @@ title.TextColor3 = Color3.fromRGB(120,120,120)
 
 -- ================= INFO =================
 local info = Instance.new("TextLabel", frame)
-info.Size = UDim2.new(1, -20, 0, 85)
+info.Size = UDim2.new(1, -20, 0, 100)
 info.Position = UDim2.new(0, 10, 0, 30)
 info.BackgroundTransparency = 1
 info.Font = Enum.Font.GothamMedium
@@ -92,7 +99,7 @@ darkBtn.MouseButton1Click:Connect(function()
 	darkMode = not darkMode
 	darkBtn.Text = darkMode and "☀" or "☾"
 
-	frame.BackgroundColor3 = darkMode and Color3.fromRGB(30,30,30) or Color3.fromRGB(255,255,255)
+	frame.BackgroundColor3 = darkMode and Color3.fromRGB(28,28,28) or Color3.fromRGB(255,255,255)
 	info.TextColor3 = darkMode and Color3.fromRGB(235,235,235) or Color3.fromRGB(20,20,20)
 	title.TextColor3 = darkMode and Color3.fromRGB(160,160,160) or Color3.fromRGB(120,120,120)
 end)
@@ -122,7 +129,7 @@ minBtn.MouseButton1Click:Connect(function()
 	TweenService:Create(
 		frame,
 		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-		{Size = minimized and UDim2.new(0, 55, 0, 45) or UDim2.new(0, 230, 0, 160)}
+		{Size = minimized and UDim2.new(0, 55, 0, 45) or UDim2.new(0, 235, 0, 170)}
 	):Play()
 end)
 
@@ -175,18 +182,19 @@ RunService.RenderStepped:Connect(function()
 		last = tick()
 	end
 
-	-- Lấy pollen Balloon chính xác trong BSS
-	local balloonPollen = 0
+	-- Balloon pollen (Hive – nếu server expose)
+	local balloonPollen = "N/A"
 	pcall(function()
-		for _,obj in ipairs(workspace:GetDescendants()) do
-			if obj.Name == "Balloon" and obj:FindFirstChild("Owner") then
-				if obj.Owner.Value == player then
-					if obj:FindFirstChild("Pollen") then
-						balloonPollen = obj.Pollen.Value
-					elseif obj:FindFirstChild("CurrentPollen") then
-						balloonPollen = obj.CurrentPollen.Value
+		if workspace:FindFirstChild("Balloons") then
+			for _,b in ipairs(workspace.Balloons:GetChildren()) do
+				if b:FindFirstChild("Owner") and b.Owner.Value == player then
+					if b:FindFirstChild("Pollen") then
+						balloonPollen = math.floor(b.Pollen.Value)
+						return
+					elseif b:FindFirstChild("CurrentPollen") then
+						balloonPollen = math.floor(b.CurrentPollen.Value)
+						return
 					end
-					break
 				end
 			end
 		end
@@ -197,5 +205,5 @@ RunService.RenderStepped:Connect(function()
 		"\nPing: "..math.floor(player:GetNetworkPing()*1000).." ms"..
 		"\nPlayers: "..#Players:GetPlayers()..
 		"\nPlayed Time: "..math.floor(os.clock() - startTime).."s"..
-		"\nBalloon Pollen: "..balloonPollen
+		"\nBalloon Pollen (Hive): "..balloonPollen
 end)
