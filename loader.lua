@@ -1,18 +1,13 @@
---[[ 
-    Polaz FPS | CheckFps
-    FPS | Ping | Players | Played Time
-    Balloon Pollen (Hive - nếu game expose)
-    Dark / Light Mode
-    Minimize (icon-only)
-    Hop Server / Small Server
-    Anti-AFK (ngầm)
-]]
+-- Balloons Check by Polaz | CheckFps
+-- FPS | Ping | Players | Played Time
+-- Balloon Pollen (Hive/Field nếu client có thể đọc)
+-- Dark/Light Mode | Minimize | Hop/Small Server | Anti-AFK
 
 pcall(function()
 	game.Players.LocalPlayer.PlayerGui:FindFirstChild("PolazFPS"):Destroy()
 end)
 
--- SERVICES
+-- Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
@@ -23,14 +18,14 @@ local VirtualUser = game:GetService("VirtualUser")
 local player = Players.LocalPlayer
 local placeId = game.PlaceId
 
--- ================= ANTI AFK =================
+-- Anti AFK
 player.Idled:Connect(function()
 	VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
 	task.wait(0.5)
 	VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
 end)
 
--- ================= GUI =================
+-- GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "PolazFPS"
 gui.ResetOnSpawn = false
@@ -46,21 +41,15 @@ frame.BackgroundTransparency = 0.15
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
-
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0,14)
-local stroke = Instance.new("UIStroke", frame)
-stroke.Transparency = 0.35
+Instance.new("UIStroke", frame).Transparency = 0.35
 
--- ================= APPEAR ANIMATION =================
+-- Appear animation
 local scale = Instance.new("UIScale", frame)
 scale.Scale = 0.5
-TweenService:Create(
-	scale,
-	TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-	{Scale = 1}
-):Play()
+TweenService:Create(scale, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
 
--- ================= TITLE =================
+-- Title
 local title = Instance.new("TextLabel", frame)
 title.Text = "Polaz FPS"
 title.Size = UDim2.new(1, -80, 0, 20)
@@ -71,7 +60,7 @@ title.TextSize = 13
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.TextColor3 = Color3.fromRGB(120,120,120)
 
--- ================= INFO =================
+-- Info
 local info = Instance.new("TextLabel", frame)
 info.Size = UDim2.new(1, -20, 0, 100)
 info.Position = UDim2.new(0, 10, 0, 30)
@@ -83,7 +72,7 @@ info.TextXAlignment = Enum.TextXAlignment.Left
 info.TextYAlignment = Enum.TextYAlignment.Top
 info.TextColor3 = Color3.fromRGB(20,20,20)
 
--- ================= DARK MODE =================
+-- Dark Mode
 local darkMode = false
 local darkBtn = Instance.new("TextButton", frame)
 darkBtn.Size = UDim2.new(0, 26, 0, 26)
@@ -94,17 +83,15 @@ darkBtn.TextSize = 14
 darkBtn.BackgroundColor3 = Color3.fromRGB(240,240,240)
 darkBtn.BorderSizePixel = 0
 Instance.new("UICorner", darkBtn)
-
 darkBtn.MouseButton1Click:Connect(function()
 	darkMode = not darkMode
 	darkBtn.Text = darkMode and "☀" or "☾"
-
 	frame.BackgroundColor3 = darkMode and Color3.fromRGB(28,28,28) or Color3.fromRGB(255,255,255)
 	info.TextColor3 = darkMode and Color3.fromRGB(235,235,235) or Color3.fromRGB(20,20,20)
 	title.TextColor3 = darkMode and Color3.fromRGB(160,160,160) or Color3.fromRGB(120,120,120)
 end)
 
--- ================= MINIMIZE =================
+-- Minimize
 local minimized = false
 local minBtn = Instance.new("TextButton", frame)
 minBtn.Size = UDim2.new(0, 26, 0, 26)
@@ -115,25 +102,19 @@ minBtn.TextSize = 14
 minBtn.BackgroundColor3 = Color3.fromRGB(240,240,240)
 minBtn.BorderSizePixel = 0
 Instance.new("UICorner", minBtn)
-
 minBtn.MouseButton1Click:Connect(function()
 	minimized = not minimized
 	minBtn.Text = minimized and "+" or "—"
-
 	info.Visible = not minimized
 	title.Visible = not minimized
 	darkBtn.Visible = not minimized
 	hopBtn.Visible = not minimized
 	smallBtn.Visible = not minimized
-
-	TweenService:Create(
-		frame,
-		TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-		{Size = minimized and UDim2.new(0, 55, 0, 45) or UDim2.new(0, 235, 0, 170)}
-	):Play()
+	TweenService:Create(frame, TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		{Size = minimized and UDim2.new(0, 55, 0, 45) or UDim2.new(0, 235, 0, 170)}):Play()
 end)
 
--- ================= HOP SERVER =================
+-- Hop Server
 hopBtn = Instance.new("TextButton", frame)
 hopBtn.Size = UDim2.new(0, 95, 0, 28)
 hopBtn.Position = UDim2.new(0, 10, 1, -36)
@@ -143,12 +124,11 @@ hopBtn.TextSize = 12
 hopBtn.BackgroundColor3 = Color3.fromRGB(235,235,235)
 hopBtn.BorderSizePixel = 0
 Instance.new("UICorner", hopBtn)
-
 hopBtn.MouseButton1Click:Connect(function()
 	TeleportService:Teleport(placeId, player)
 end)
 
--- ================= SMALL SERVER =================
+-- Small Server
 smallBtn = Instance.new("TextButton", frame)
 smallBtn.Size = UDim2.new(0, 95, 0, 28)
 smallBtn.Position = UDim2.new(1, -105, 1, -36)
@@ -158,7 +138,6 @@ smallBtn.TextSize = 12
 smallBtn.BackgroundColor3 = Color3.fromRGB(235,235,235)
 smallBtn.BorderSizePixel = 0
 Instance.new("UICorner", smallBtn)
-
 smallBtn.MouseButton1Click:Connect(function()
 	local url = "https://games.roblox.com/v1/games/"..placeId.."/servers/Public?limit=100&sortOrder=Asc"
 	local data = HttpService:JSONDecode(game:HttpGet(url))
@@ -170,7 +149,7 @@ smallBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- ================= FPS / PLAYED TIME / BALLOON POLLEN =================
+-- FPS / Played Time / Balloon Pollen
 local startTime = os.clock()
 local fps, frames, last = 0, 0, tick()
 
@@ -182,18 +161,37 @@ RunService.RenderStepped:Connect(function()
 		last = tick()
 	end
 
-	-- Balloon pollen (Hive – nếu server expose)
-	local balloonPollen = "N/A"
+	-- Balloon pollen (Hive + Field nếu client thấy)
+	local balloonPollen = 0
 	pcall(function()
-		if workspace:FindFirstChild("Balloons") then
-			for _,b in ipairs(workspace.Balloons:GetChildren()) do
-				if b:FindFirstChild("Owner") and b.Owner.Value == player then
-					if b:FindFirstChild("Pollen") then
-						balloonPollen = math.floor(b.Pollen.Value)
+		-- 1️⃣ Field Balloon
+		for _,obj in ipairs(workspace:GetDescendants()) do
+			if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
+				if obj.Owner.Value == player then
+					if obj:FindFirstChild("Pollen") then
+						balloonPollen = math.floor(obj.Pollen.Value)
 						return
-					elseif b:FindFirstChild("CurrentPollen") then
-						balloonPollen = math.floor(b.CurrentPollen.Value)
+					elseif obj:FindFirstChild("CurrentPollen") then
+						balloonPollen = math.floor(obj.CurrentPollen.Value)
 						return
+					end
+				end
+			end
+		end
+		-- 2️⃣ Hive Balloon (workspace.Hives/HiveModels nếu client thấy)
+		for _,hive in ipairs(workspace:GetChildren()) do
+			if hive.Name:lower():find("hive") then
+				for _,obj in ipairs(hive:GetDescendants()) do
+					if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
+						if obj.Owner.Value == player then
+							if obj:FindFirstChild("Pollen") then
+								balloonPollen = math.floor(obj.Pollen.Value)
+								return
+							elseif obj:FindFirstChild("CurrentPollen") then
+								balloonPollen = math.floor(obj.CurrentPollen.Value)
+								return
+							end
+						end
 					end
 				end
 			end
@@ -205,5 +203,5 @@ RunService.RenderStepped:Connect(function()
 		"\nPing: "..math.floor(player:GetNetworkPing()*1000).." ms"..
 		"\nPlayers: "..#Players:GetPlayers()..
 		"\nPlayed Time: "..math.floor(os.clock() - startTime).."s"..
-		"\nBalloon Pollen (Hive): "..balloonPollen
+		"\nBalloon Pollen (Hive/Field): "..balloonPollen
 end)
