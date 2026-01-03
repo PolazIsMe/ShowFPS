@@ -1,6 +1,6 @@
--- Balloons Check | CheckFps Optimized
+-- Polaz FPS | CheckFps Optimized
 -- FPS | Ping | Players | Played Time
--- Balloon Pollen (Field/Hive nếu client có thể đọc)
+-- Balloon Pollen (Field)
 -- Dark/Light Mode | Minimize | Hop/Small Server | Anti-AFK
 
 pcall(function()
@@ -148,7 +148,7 @@ smallBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- FPS / Played Time / Balloon Pollen
+-- FPS / Played Time / Balloon Pollen (Field)
 local startTime = os.clock()
 local fps, frames, last = 0, 0, tick()
 local balloonUpdate = 0
@@ -162,53 +162,25 @@ RunService.RenderStepped:Connect(function(dt)
 		last = tick()
 	end
 
-	-- Cập nhật Balloon pollen 1 lần mỗi giây → tránh lag
+	-- Cập nhật Balloon pollen 1 lần mỗi giây
 	balloonUpdate += dt
 	if balloonUpdate >= 1 then
 		balloonUpdate = 0
+		local count = 0
 		pcall(function()
-			local found = false
-			-- Field Balloon
 			for _,obj in ipairs(workspace:GetDescendants()) do
 				if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
 					if obj.Owner.Value == player then
 						if obj:FindFirstChild("Pollen") then
-							balloonPollen = math.floor(obj.Pollen.Value)
-							found = true
-							break
+							count += math.floor(obj.Pollen.Value)
 						elseif obj:FindFirstChild("CurrentPollen") then
-							balloonPollen = math.floor(obj.CurrentPollen.Value)
-							found = true
-							break
+							count += math.floor(obj.CurrentPollen.Value)
 						end
 					end
 				end
 			end
-			-- Hive Balloon (workspace.Hives/HiveModels nếu client thấy)
-			if not found then
-				for _,hive in ipairs(workspace:GetChildren()) do
-					if hive.Name:lower():find("hive") then
-						for _,obj in ipairs(hive:GetDescendants()) do
-							if obj.Name:lower():find("balloon") and obj:FindFirstChild("Owner") then
-								if obj.Owner.Value == player then
-									if obj:FindFirstChild("Pollen") then
-										balloonPollen = math.floor(obj.Pollen.Value)
-										found = true
-										break
-									elseif obj:FindFirstChild("CurrentPollen") then
-										balloonPollen = math.floor(obj.CurrentPollen.Value)
-										found = true
-										break
-									end
-								end
-							end
-						end
-						if found then break end
-					end
-				end
-			end
-			if not found then balloonPollen = 0 end
 		end)
+		balloonPollen = count
 	end
 
 	info.Text =
@@ -216,5 +188,5 @@ RunService.RenderStepped:Connect(function(dt)
 		"\nPing: "..math.floor(player:GetNetworkPing()*1000).." ms"..
 		"\nPlayers: "..#Players:GetPlayers()..
 		"\nPlayed Time: "..math.floor(os.clock() - startTime).."s"..
-		"\nBalloon Pollen: "..balloonPollen
+		"\nBalloon Pollen (Field): "..balloonPollen
 end)
